@@ -12,7 +12,7 @@ import java.util.Random;
  * @author Jonathan Moreno
  */
 public class Numbers {
-    private int randomNum;
+    private static int randomNum;
     
     // Getter for the random number, randomNum
     public int getRandomNum() {
@@ -21,13 +21,13 @@ public class Numbers {
     
     // Setter for the randomNum
     public void setRandomNum(int randomNum) {
-        this.randomNum = randomNum;
+        Numbers.randomNum = randomNum;
     }
     
     // The method to generate the random Number between 0 and 100
     public void generateNumber() {
         Random rand = new Random();
-        this.randomNum = rand.nextInt(101); // This is the 0 to 100 
+        randomNum = rand.nextInt(101); // This is the 0 to 100 
     }
     
     // Next Method to compare a guess with the generated number

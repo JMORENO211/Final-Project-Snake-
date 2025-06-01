@@ -6,7 +6,7 @@ package word.game;
 
 /**
  *
- * @author doom
+ * @author Jonathan Moreno
  */
 public class WordGame {
 
