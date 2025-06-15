@@ -11,7 +11,7 @@ import java.util.Scanner;
  * @author Jonathan Moreno
  */
 public class GamePlay {
-    
+    private static final Players[] currentPlayers = new Players[3];
     public static void main(String[] args) {
         // Should ask for the user's first name
         try (Scanner scanner = new Scanner(System.in)) {
@@ -20,40 +20,40 @@ public class GamePlay {
             Hosts host = new Hosts("Bob Barker");
             Turn turn = new Turn();
             
-            // Get the Players information
-            System.out.print("Enter your first name ");
-            String firstName = scanner.nextLine();
-            
-            System.out.print("Would you like to enter your last name? (yes/no): ");
-            String response = scanner.nextLine().trim().toLowerCase();
-            
-            Players player;
-            if (response.equals("yes")) {
-                System.out.print("Enter your last name: ");
-                String lastName = scanner.nextLine();
-                player = new Players(firstName, lastName);
-            } else {
-                player = new Players(firstName);
-            }
-            
-            
-            // The Main game Loop
+            // Adds the new players
+           for (int i = 0; i < currentPlayers.length; i++) {
+               System.out.print("Enter player " + (i + 1) + " first name: ");
+               String firstName = scanner.nextLine().trim();
+               
+               System.out.print("Would you like to enter player " + (i + 1) + " last name? (yes/no): ");
+               String response = scanner.nextLine().trim().toLowerCase();
+               
+               if (response.equals("yes")) {
+                   System.out.print("Enter last name: ");
+                   String lastName = scanner.nextLine().trim();
+                   currentPlayers[i] = new Players (firstName, lastName);
+               } else {
+                   currentPlayers[i] = new Players(firstName);
+               }
+           }
+                    
             boolean keepPlaying = true;
             while (keepPlaying) {
                 host.randomizeNum();
                 boolean guessCorrectly = false;
+                int playerIndex = 0;
                 
-                // Loop until the correct guess is provided
+                // Loops until the correct guess is provided by the player 
                 while (!guessCorrectly) {
-                guessCorrectly = turn.takeTurn(player, host);
+                    Players current = currentPlayers[playerIndex];
+                    guessCorrectly = turn.takeTurn(current, host);
+                    playerIndex = (playerIndex + 1) % currentPlayers.length;
         }
-          
-                System.out.print("Do you want to play again? (yes/no): ");
+                System.out.print("Would you like to play again? (yes/no): ");
                 String again = scanner.next().trim().toLowerCase();
                 keepPlaying = again.equals("yes");
             }
-            
-            System.out.println("Thanks for playing!");
+            System.out.println("Thanks for playing contestant!");
         }
     }
 }

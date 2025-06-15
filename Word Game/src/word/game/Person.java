@@ -45,4 +45,13 @@ public class Person {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+    /**
+     * @return full name (first + optional last)
+     */
+    public String getName() {
+        if (lastName == null || lastName.isBlank()) {
+            return firstName;
+        }
+        return firstName + " " + lastName;
+    }
 }

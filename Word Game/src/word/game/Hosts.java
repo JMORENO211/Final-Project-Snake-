@@ -8,17 +8,16 @@ package word.game;
  * @author Jonathan Moreno
  */
 public class Hosts extends Person {
-    private Numbers numbers;
-    
+    private final Numbers numbers;
+
     public Hosts(String firstName) {
         super(firstName);
-        numbers = new Numbers();
+        this.numbers = new Numbers();
     }
     public void randomizeNum() {
         numbers.generateNumber();
     }
-    
-    public Numbers getNumbers() {
-        return numbers;
+    public boolean checkGuess(int guess) {
+        return numbers.compareNumber(guess);
     }
 }

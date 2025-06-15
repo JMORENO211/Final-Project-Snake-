@@ -3,30 +3,40 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package word.game;
+import java.util.Random;
 import java.util.Scanner;
 /**
  *
  * @author Jonathan Moreno
  */
 public class Turn {
-    private static final int WIN_REWARD = 250;
-    private static final int LOSS_PENALTY = 100;
-    
+    private final Random rand = new Random();
+    private final Scanner scanner = new Scanner(System.in);
+
+    /**
+     * Player gets  one turn: prompts the player and checks against the host’s number that was randomly selected, then
+     * The award prize is displayed, an update of the player’s balance is shown, and the print status is provided after the guess 
+     *
+     * @param player the current player
+     * @param host   the host holding the target number
+     * @return true if the player guessed correctly
+     */
     public boolean takeTurn(Players player, Hosts host) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print(host.getFirstName() + " says: " + player.getFirstName() + ", enter your guess (0-100): ");
+        System.out.print(player.getName() + ", enter your guess: ");
         int guess = scanner.nextInt();
-        
-        boolean correct = host.getNumbers().compareNumber(guess); // Numbers must be imported or in same package
-        if(correct) {
-            player.setMoney(player.getMoney() + WIN_REWARD);
-            System.out.println("Congratulations!" + player + " is the winner!");
-            return true;
-        }else {
-            player.setMoney(player.getMoney() - LOSS_PENALTY);
-            System.out.println(player);
-                    return false;
-        }
-        
+
+        boolean correct = host.checkGuess(guess);
+
+        // chooses both the prize and money amount, not sure if I should do it differently 
+        Award award = rand.nextBoolean()
+            ? new Money(100, 250)   
+            : new Physical();
+
+        // displays the prize, updates balance, and shows the current status of the player's funds - this ties from earlier
+        int delta = award.displayWinnings(player, correct);
+        player.setMoney(player.getMoney() + delta);
+        System.out.println(player);
+
+        return correct;
     }
 }
