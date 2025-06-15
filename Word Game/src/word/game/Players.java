@@ -27,12 +27,12 @@ public class Players extends Person {
         return money;
     }
     
-    public void setMoney(int money) {
-        this.money = money;
+    public void setMoney(int delta) {
+        this.money += delta;
     }
     
     @Override
     public String toString() {
-        return getFirstName() + " " + getLastName() + " has $" + money;
+        return getName() + " has $" + money;
     }
 }

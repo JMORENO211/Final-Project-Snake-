@@ -12,48 +12,58 @@ import java.util.Scanner;
  */
 public class GamePlay {
     private static final Players[] currentPlayers = new Players[3];
+
     public static void main(String[] args) {
-        // Should ask for the user's first name
         try (Scanner scanner = new Scanner(System.in)) {
-            
-            // Creates the host
-            Hosts host = new Hosts("Bob Barker");
-            Turn turn = new Turn();
-            
-            // Adds the new players
-           for (int i = 0; i < currentPlayers.length; i++) {
-               System.out.print("Enter player " + (i + 1) + " first name: ");
-               String firstName = scanner.nextLine().trim();
-               
-               System.out.print("Would you like to enter player " + (i + 1) + " last name? (yes/no): ");
-               String response = scanner.nextLine().trim().toLowerCase();
-               
-               if (response.equals("yes")) {
-                   System.out.print("Enter last name: ");
-                   String lastName = scanner.nextLine().trim();
-                   currentPlayers[i] = new Players (firstName, lastName);
-               } else {
-                   currentPlayers[i] = new Players(firstName);
-               }
-           }
-                    
-            boolean keepPlaying = true;
-            while (keepPlaying) {
-                host.randomizeNum();
-                boolean guessCorrectly = false;
-                int playerIndex = 0;
-                
-                // Loops until the correct guess is provided by the player 
-                while (!guessCorrectly) {
-                    Players current = currentPlayers[playerIndex];
-                    guessCorrectly = turn.takeTurn(current, host);
-                    playerIndex = (playerIndex + 1) % currentPlayers.length;
-        }
-                System.out.print("Would you like to play again? (yes/no): ");
-                String again = scanner.next().trim().toLowerCase();
-                keepPlaying = again.equals("yes");
+            // 1) Creates host
+            Hosts host = new Hosts("Bob Barker here and welcome to the word game!");
+
+            // 2) Gather 3 players
+            for (int i = 0; i < currentPlayers.length; i++) {
+                System.out.print("Enter player " + (i + 1) + " first name: ");
+                String firstName = scanner.nextLine().trim();
+
+                System.out.print("Would you like to enter player " + (i + 1) + " last name? (yes/no): ");
+                String response = scanner.nextLine().trim().toLowerCase();
+
+                if (response.equals("yes")) {
+                    System.out.print("Enter last name: ");
+                    String lastName = scanner.nextLine().trim();
+                    currentPlayers[i] = new Players(firstName, lastName);
+                } else {
+                    currentPlayers[i] = new Players(firstName);
+                }
             }
-            System.out.println("Thanks for playing contestant!");
+
+            // 3) Main game loop
+             boolean keepPlaying = true;
+            while (keepPlaying) {
+                host.promptForPhrase();
+                System.out.println("The Phrase to guess: " + Phrases.getPlayingPhrase() + "\n");
+
+                Turn turn = new Turn();
+                while (Phrases.getPlayingPhrase().contains("_")) {
+                    for (Players current : currentPlayers) {
+                        turn.takeTurn(current);
+                        System.out.println("Current: " + Phrases.getPlayingPhrase() + "\n");
+                        if (!Phrases.getPlayingPhrase().contains("_")) {
+                            break;
+                        }
+                    }
+                }
+
+                System.out.println("Round complete!");
+                System.out.print("Play again? (yes/no): ");
+                String again = scanner.nextLine().trim().toLowerCase();
+                keepPlaying = again.equals("yes");
+                System.out.println();
+            }
+
+            System.out.println("Thanks for playing!");
         }
     }
 }
+
+            
+            
+          
