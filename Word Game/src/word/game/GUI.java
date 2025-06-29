@@ -89,7 +89,7 @@ public class GUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Please set the host and add players first.");
             return;
         }
-        Award award = new Money(600, 350); // or new Physical()
+        Award award = new Money(600, 450); // or new Physical()
         while (Phrases.getPlayingPhrase().contains("_")) {
             for (var p : playersList) {
                 String input = JOptionPane.showInputDialog(p.getName() + ", enter a letter:");
