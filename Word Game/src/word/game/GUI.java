@@ -8,6 +8,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import javax.sound.sampled.*;
+import java.io.IOException;
+import java.util.Random; 
+import java.net.URL;
 /**
  *
  * @author Jonathan Moreno
@@ -24,6 +28,7 @@ public class GUI extends JFrame {
     private final JLabel phraseLabel = new JLabel("Phrase: ");
     private final JTextArea messageArea = new JTextArea(10, 40);
     private final JCheckBox saveMessagesCheckBox = new JCheckBox("Save Messages"); // added section
+    private final Random random = new Random(); // for animation
 
     // Step 3: Frame setup for the gui
     public GUI() {
@@ -59,6 +64,15 @@ public class GUI extends JFrame {
             "Designed for the ALT-G access",
             "Layout Information",
             JOptionPane.INFORMATION_MESSAGE));
+        
+        JMenuItem attributionItem = new JMenuItem("Attribution");
+        attributionItem.addActionListener(e -> JOptionPane.showMessageDialog(this,
+            "Images and sounds:\n" +
+            "- Trophy Image by HUNGQUACH679PNG from https://pixabay.com/illustrations/winner-cup-glory-medal-prize-7176296/\n" +
+            "- Winner Bell Game Show by oldegarfrom https://freesound.org/people/oldedgar/sounds/97980/" + // 
+            "- Wrong Answer by Andreas from https://freesound.org/people/-Andreas/sounds/648462/", // I did have to change it to a wav file as the mp3 was not supported 
+            "Attribution",
+            JOptionPane.INFORMATION_MESSAGE));
 
         aboutMenu.add(layoutInfoItem);
         menuBar.add(aboutMenu);
@@ -68,6 +82,7 @@ public class GUI extends JFrame {
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new GridLayout(3, 1));
         infoPanel.add(playersLabel);
+        infoPanel.add(hostLabel);
         infoPanel.add(phraseLabel);
 
         // Step 8: Message display area with scroll bar
@@ -146,42 +161,125 @@ public class GUI extends JFrame {
         }
     }
 
-    // Starts the Game logic
-    private void startGame() {
-        if (host == null || playersList.isEmpty()) {
-            addMessage("Please set the host and add players first.");
+ private void playSound(String resourcePath) { // this was a challenge as I had to look up in stack over flow how to add as a classpath so it works in netbeans correctly 
+    try {
+        URL soundURL = getClass().getClassLoader().getResource(resourcePath);
+        if (soundURL == null) {
+            addMessage("Sound not found: " + resourcePath);
             return;
         }
-        Award award = new Money(450, 350);
-        while (Phrases.getPlayingPhrase().contains("_")) {
-            for (var p : playersList) {
-                String input = JOptionPane.showInputDialog(p.getName() + ", enter a letter:");
-                if (input == null) return;
-                try {
-                    String before = Phrases.getPlayingPhrase();
-                    Phrases.findLetters(input);
-                    boolean correct = !Phrases.getPlayingPhrase().equals(before);
-                    int moneyChange = award.displayWinnings(p, correct);
-                    p.setMoney(moneyChange);
-                    addMessage((correct ? "Correct!" : "Wrong!") + "\n" + p + "\nPhrase: " + Phrases.getPlayingPhrase());
-                    updatePhraseLabel();
-                    if (!Phrases.getPlayingPhrase().contains("_")) {
-                        int again = JOptionPane.showConfirmDialog(this, p.getName() + " won!\nPlay again?", "Game Over", JOptionPane.YES_NO_OPTION);
-                        if (again == JOptionPane.YES_OPTION) {
-                            resetGame();
-                            return;
-                        } else {
-                            System.exit(0);
-                        }
+        AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundURL);
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioIn);
+        clip.start();
+    } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+        addMessage("Error playing sound: " + e.getMessage());
+    }
+}
+
+    
+private void showPrizeImage(String resourcePath) {
+    URL imageUrl = getClass().getClassLoader().getResource(resourcePath);
+    if (imageUrl == null) {
+        addMessage("Image not found: " + resourcePath);
+        return;
+    }
+    ImageIcon prizeImage = new ImageIcon(imageUrl);
+    JLabel imageLabel = new JLabel(prizeImage);
+    JOptionPane.showMessageDialog(this, imageLabel, "You won a prize!", JOptionPane.INFORMATION_MESSAGE);
+}
+    
+    private class FloatingAnimationPanel extends JPanel implements ActionListener { 
+        private int x = 0;
+        private final Timer timer;
+
+        public FloatingAnimationPanel() {
+            setPreferredSize(new Dimension(350, 200));
+            timer = new Timer(10, this);
+            timer.start();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.setColor(Color.RED);
+            g.fillOval(x, 50, 50, 50); // easy going circle
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            x += 2;
+            if (x > getWidth()) {
+                timer.stop();
+                SwingUtilities.getWindowAncestor(this).dispose();
+            }
+            repaint();
+        }
+    }
+
+    private void showFloatingAnimation() { 
+        JFrame animFrame = new JFrame("Whammy Animation!");
+        animFrame.setUndecorated(true);
+        animFrame.add(new FloatingAnimationPanel());
+        animFrame.pack();
+        animFrame.setLocationRelativeTo(this);
+        animFrame.setVisible(true);
+    }
+    
+  private void startGame() {
+    if (host == null || playersList.isEmpty()) {
+        addMessage("Please set the host and add players first.");
+        return;
+    }
+
+    Award award = new Money(450, 350);
+
+    while (Phrases.getPlayingPhrase().contains("_")) {
+        for (var p : playersList) {
+            String input = JOptionPane.showInputDialog(p.getName() + ", enter a letter:");
+            if (input == null) return;
+
+            try {
+                String before = Phrases.getPlayingPhrase();
+                Phrases.findLetters(input);
+                boolean correct = !Phrases.getPlayingPhrase().equals(before);
+                int moneyChange = award.displayWinnings(p, correct);
+                p.setMoney(moneyChange);
+
+                if (correct) {
+                    playSound("resources/winner.aiff");// did not change format as aiff is supported // section where I had to find how to load files via classpath 
+                } else {
+                    playSound("resources/buzzer.wav");// section where I had to find how to load files via classpath 
+
+                    if (!random.nextBoolean()) {
+                    } else {
+                        showFloatingAnimation();
                     }
-                } catch (MultipleLettersException e) {
-                    addMessage(e.getMessage());
-                } catch (HeadlessException e) {
-                    addMessage("Please enter only one letter at a time.");
                 }
+
+                addMessage((correct ? "Correct!" : "Wrong!") + "\n" + p + "\nPhrase: " + Phrases.getPlayingPhrase());
+                updatePhraseLabel();
+
+                if (!Phrases.getPlayingPhrase().contains("_")) {
+                    showPrizeImage("resources/trophy.png"); // section where I had to find how to load files via classpath 
+
+                    int again = JOptionPane.showConfirmDialog(this, p.getName() + " won!\nPlay again?", "Game Over", JOptionPane.YES_NO_OPTION);
+                    if (again == JOptionPane.YES_OPTION) {
+                        resetGame();
+                        return;
+                    } else {
+                        System.exit(0);
+                    }
+                }
+
+            } catch (MultipleLettersException e) {
+                addMessage(e.getMessage());
+            } catch (HeadlessException e) {
+                addMessage("Please enter only one letter at a time.");
             }
         }
     }
+}
 
     // Reset state for new game
     private void resetGame() {
