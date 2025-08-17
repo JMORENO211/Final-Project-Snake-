@@ -6,7 +6,7 @@ package snake;
 
 /**
  *
- * @author doom
+ * @author Jonathan Moreno
  */
 /** Is thrown  when trying to move the snake in reverse  */
 public class WrongMoveException extends Exception {

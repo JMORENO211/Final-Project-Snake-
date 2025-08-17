@@ -4,7 +4,7 @@
  */
 package snake;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics2D; // I used youtube to better understand this 
 /**
  *
  * @author Jonathan Moreno

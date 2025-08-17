@@ -6,7 +6,7 @@ package snake;
 
 /**
  *
- * @author doom
+ * @author Jonathan Moreno
  */
 import java.io.IOException;
 import javax.sound.sampled.*;
