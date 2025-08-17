@@ -13,7 +13,7 @@ import java.net.URL;
  * @author Jonathan Moreno
  */
 public class Images {
-    public static Image load(String resourcePath) {
+    public static Image load(String resourcePath) { // This is a test to make sure its the correct file 
         try {
             URL url = Images.class.getClassLoader().getResource(resourcePath);
             if (url == null) return null;

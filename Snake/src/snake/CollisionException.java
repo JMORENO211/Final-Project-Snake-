@@ -8,6 +8,6 @@ package snake;
  *
  * @author Jonathan Moreno
  */
-public class CollisionException extends Exception {
+public class CollisionException extends Exception { // designed to prevent the snake from crashing into itself
     public CollisionException(String msg) { super(msg); }
 }

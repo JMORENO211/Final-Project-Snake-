@@ -8,7 +8,7 @@ package snake;
  *
  * @author Jonathan Moreno
  */
-public enum Directions { // created to define how the snake moves 
+public enum Directions { // created to define how the snake moves and note is to better clarify 
     LEFT, RIGHT, UP, DOWN;
     public Directions opposite() {
         return switch (this) {
